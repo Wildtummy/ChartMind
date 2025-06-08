@@ -8,6 +8,8 @@ import io
 import os
 import json
 from datetime import datetime, timedelta
+import plotly.io as pio
+
 
 GOOGLE_API_KEY = st.secrets["google"]["api_key"]
 genai.configure(api_key=GOOGLE_API_KEY)
@@ -123,11 +125,12 @@ if "stock_data" in st.session_state and st.session_state["stock_data"]:
 
 
         
-        img_bytes = fig.to_image(format="png", engine="kaleido")
+        img_bytes = fig.to_image(format="png", width=1000, height=600, scale=2)
+
         image_part = {
-          "data": img_bytes,
-           "mime_type": "image/png"
-                }
+             "data": img_bytes,
+                "mime_type": "image/png"
+                    }
 
 
         
