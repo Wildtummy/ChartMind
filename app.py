@@ -4,7 +4,7 @@ import yfinance as yf
 import pandas as pd
 import plotly.graph_objects as go
 import google.generativeai as genai
-import tempfile
+import io
 import os
 import json
 from datetime import datetime, timedelta
@@ -123,19 +123,15 @@ if "stock_data" in st.session_state and st.session_state["stock_data"]:
 
 
         
-        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmpfile:
-            fig.write_image(tmpfile.name)
-            tmpfile_path = tmpfile.name
-        with open(tmpfile_path, "rb") as f:
-            image_bytes = f.read()
-        os.remove(tmpfile_path)
+        img_bytes = fig.to_image(format="png", engine="kaleido")
+        image_part = {
+          "data": img_bytes,
+           "mime_type": "image/png"
+                }
+
 
         
-        image_part = {
-            "data": image_bytes,  
-            "mime_type": "image/png"
-        }
-
+        
         #  prompt 
         analysis_prompt = f"""
 You are a Stock Trader specializing in Technical Analysis at a top financial institution.
