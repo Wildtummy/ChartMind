@@ -81,8 +81,13 @@ if st.sidebar.button("Fetch Data"):
             stock_data[ticker] = data
         else:
             st.warning(f"No data found for {ticker}.")
-    st.session_state["stock_data"] = stock_data
-    st.success("Stock data loaded successfully for: " + ", ".join(stock_data.keys()))
+    if stock_data:
+        st.session_state["stock_data"] = stock_data
+        st.success("Stock data loaded successfully for: " + ", ".join(stock_data.keys()))
+    else:
+        st.session_state["stock_data"] = {}
+        st.error("No valid stock data could be loaded. Please check the ticker symbols and date range.")
+
 
 
 if "stock_data" in st.session_state and st.session_state["stock_data"]:
