@@ -10,6 +10,13 @@ import json
 from datetime import datetime, timedelta
 import plotly.io as pio
 
+st.set_page_config(
+    page_title="ChartMind",
+    page_icon="📈",
+    layout="wide",
+    initial_sidebar_state="expanded")
+
+
 
 GOOGLE_API_KEY = st.secrets["google"]["api_key"]
 genai.configure(api_key=GOOGLE_API_KEY)
@@ -18,12 +25,8 @@ MODEL_NAME = 'gemini-2.0-flash'
 gen_model = genai.GenerativeModel(MODEL_NAME)
 
 
-st.set_page_config(layout="wide")
-st.title("ChartMind: AI-Powered Visual Stock Analyser")
-st.markdown(
-    '<p style="font-size:20px; font-weight:500; color:gray;">Decode market movements with technical indicators and Google Gemini-driven insights.</p>',
-    unsafe_allow_html=True
-)
+
+
 
 with st.sidebar:
 
