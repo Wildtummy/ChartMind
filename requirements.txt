@@ -3,4 +3,4 @@ yfinance
 pandas
 plotly
 google-generativeai
-kaleido
+kaleido==0.2.1
