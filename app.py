@@ -9,7 +9,7 @@ import os
 import json
 from datetime import datetime, timedelta
 import plotly.io as pio
-
+import base64
 st.set_page_config(
     page_title="ChartMind",
     page_icon="📈",
@@ -18,8 +18,8 @@ st.set_page_config(
 
 
 
-from openai import OpenAI
-import base64
+
+
 
 OPENROUTER_API_KEY = st.secrets["openrouter"]["api_key"]
 
@@ -196,20 +196,23 @@ Write the justification as if preparing a research note for a senior portfolio m
 
             result_text = response.choices[0].message.content
 
+            result_text = result_text.replace("```json", "").replace("```", "").strip()
+
             json_start_index = result_text.find('{')
-            json_end_index = result_text.rfind('}') + 1  # +1 to include the closing brace
+            json_end_index = result_text.rfind('}') + 1
+
             if json_start_index != -1 and json_end_index > json_start_index:
-                json_string = result_text[json_start_index:json_end_index]
-                result = json.loads(json_string)
+             json_string = result_text[json_start_index:json_end_index]
+             result = json.loads(json_string)
             else:
-                raise ValueError("No valid JSON object found in the response")
+             raise ValueError("No valid JSON object found in the response")
 
         except json.JSONDecodeError as e:
-            result = {"action": "Error", "justification": f"JSON Parsing error: {e}. Raw response text: {response.text}"}
+            result = {"action": "Error", "justification": f"JSON Parsing error: {e}. Raw response text: {result_text}"}
         except ValueError as ve:
-            result = {"action": "Error", "justification": f"Value Error: {ve}. Raw response text: {response.text}"}
+            result = {"action": "Error", "justification": f"Value Error: {ve}. Raw response text: {result_text}"}
         except Exception as e:
-            result = {"action": "Error", "justification": f"General Error: {e}. Raw response text: {response.text}"}
+            result = {"action": "Error", "justification": f"General Error: {e}. Raw response text: {result_text}"}
 
         return fig, result
 
