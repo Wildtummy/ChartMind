@@ -218,7 +218,10 @@ if "stock_data" in st.session_state and st.session_state["stock_data"]:
              json_string = result_text[json_start_index:json_end_index]
              result = json.loads(json_string)
             else:
-             raise ValueError("No valid JSON object found in the response")
+                result = {
+                    "action": "Analysis Generated",
+                    "justification": result_text
+                }
 
         except json.JSONDecodeError as e:
             result = {"action": "Error", "justification": f"JSON Parsing error: {e}. Raw response text: {result_text}"}
