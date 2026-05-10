@@ -3,7 +3,7 @@ import streamlit as st
 import yfinance as yf
 import pandas as pd
 import plotly.graph_objects as go
-import google.generativeai as genai
+from openai import OpenAI
 import io
 import os
 import json
@@ -18,13 +18,17 @@ st.set_page_config(
 
 
 
-GOOGLE_API_KEY = st.secrets["google"]["api_key"]
-genai.configure(api_key=GOOGLE_API_KEY)
+from openai import OpenAI
+import base64
 
-MODEL_NAME = 'gemini-2.0-flash' 
-gen_model = genai.GenerativeModel(MODEL_NAME)
+OPENROUTER_API_KEY = st.secrets["openrouter"]["api_key"]
 
+client = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key=OPENROUTER_API_KEY,
+)
 
+MODEL_NAME = "qwen/qwen2.5-vl-72b-instruct"
 
 
 
@@ -133,12 +137,9 @@ if "stock_data" in st.session_state and st.session_state["stock_data"]:
 
 
         
-        img_bytes = fig.to_image(format="png", width=1000, height=600, scale=2)
+        img_bytes = fig.to_image(format="png", width=700, height=400, scale=1)
 
-        image_part = {
-             "data": img_bytes,
-                "mime_type": "image/png"
-                    }
+        base64_image = base64.b64encode(img_bytes).decode("utf-8")
 
 
         
@@ -168,18 +169,32 @@ Write the justification as if preparing a research note for a senior portfolio m
 
 
        
-        contents = [
-            {"role": "user", "parts": [analysis_prompt]},  
-            {"role": "user", "parts": [image_part]}       
-        ]
-
-        response = gen_model.generate_content(
-            contents=contents  
-        )
+        response = client.chat.completions.create(
+    model=MODEL_NAME,
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": analysis_prompt
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/png;base64,{base64_image}"
+                    }
+                }
+            ]
+        }
+    ],
+    temperature=0.4,
+    max_tokens=700
+)
 
         try:
 
-            result_text = response.text
+            result_text = response.choices[0].message.content
 
             json_start_index = result_text.find('{')
             json_end_index = result_text.rfind('}') + 1  # +1 to include the closing brace
