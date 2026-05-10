@@ -28,7 +28,7 @@ client = OpenAI(
     api_key=OPENROUTER_API_KEY,
 )
 
-MODEL_NAME = "qwen/qwen2.5-vl-72b-instruct"
+MODEL_NAME = "meta-llama/llama-3.2-11b-vision-instruct"
 
 
 
@@ -146,26 +146,39 @@ if "stock_data" in st.session_state and st.session_state["stock_data"]:
         
         #  prompt 
         analysis_prompt = f"""
-You are a Stock Trader specializing in Technical Analysis at a top financial institution.
+        You are an elite quantitative analyst and technical strategist at a top hedge fund.
 
-Analyze the stock chart for {ticker} based on its candlestick chart and the displayed technical indicators and include the company name (not just the ticker symbol).
+        Analyze the provided stock chart for {ticker} using:
+        - Candlestick structure
+        - Price action
+        - Trend behavior
+        - Volume confirmation
+        - Technical indicators shown on chart
+        - Momentum and volatility context
 
-Provide a detailed technical analysis that includes the following:
-1. Identification of key candlestick patterns (e.g., doji, hammer, engulfing).
-2. Description of recent trend direction (uptrend, downtrend, consolidation).
-3. Explanation of how each selected indicator (e.g., SMA, EMA, Bollinger Bands, VWAP) supports or contradicts the trend.
-4. Commentary on volume behavior and whether it confirms or diverges from the price movement.
-5. Mention any potential breakout or reversal zones.
-6. Risk assessment: highlight any conflicting signals or uncertainty factors.
+        Your objective is to produce a professional-grade trading assessment similar to what would be presented to a portfolio manager.
 
-Base your recommendation only on the chart and these factors.
+        Focus on:
+        1. Market structure (bullish, bearish, consolidation)
+        2. Important candlestick formations
+        3. Trend strength and momentum
+        4. Support and resistance zones
+        5. Breakout or reversal probability
+        6. Indicator confirmation/divergence
+        7. Risk factors and uncertainty
+        8. Short-term trading outlook
 
-Return your output as a JSON object with three keys:
-- 'action': recommendation such as 'Strong Buy', 'Hold', etc.
-- 'justification': a detailed multi-paragraph explanation.
+        Return ONLY valid JSON in this exact format:
 
-Write the justification as if preparing a research note for a senior portfolio manager.
-"""
+        {{
+        "action": "Strong Buy/Hold/Sell/etc",
+        "justification": "Detailed professional analysis here"
+        }}
+
+        Do not include markdown.
+        Do not include code fences.
+        Do not include any text outside JSON.
+        """
 
 
        
@@ -189,7 +202,7 @@ Write the justification as if preparing a research note for a senior portfolio m
         }
     ],
     temperature=0.4,
-    max_tokens=700
+    max_tokens=400
 )
 
         try:
